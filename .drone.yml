@@ -2,16 +2,16 @@ kind: pipeline
 name: default
 steps:
 - name: test
- image: golang:1.10-alpine
- commands:
+  image: golang:1.10-alpine
+  commands:
    - "go test"
 - name: build
- image: golang:1.10-alpine
- commands:
+  image: golang:1.10-alpine
+  commands:
    - "go build -o ./myapp"
 - name: publish
- image: plugins/ecr
- settings:
+  image: plugins/ecr
+  settings:
     access_key:
       from_secret: ecr_access_key
     dockerfile: Dockerfile
