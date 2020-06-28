@@ -1,36 +1,31 @@
-apiVersion: v1
-kind: Service
-metadata:
- name: hello-svc
-spec:
- selector:
-   role: app
- ports:
-   - protocol: TCP
-     port: 80
-     targetPort: 8080
-     nodePort: 32001
- type: NodePort
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
- name: hello-deployment
- labels:
-   role: app
-spec:
- replicas: 2
- selector:
-   matchLabels:
-     role: app
- template:
-   metadata:
-     labels:
-       role: app
-   spec:
-     containers:
-     - name: app
-       image: "magalixcorp/k8scicd"
-       resources:
-         requests:
-           cpu: 10m
+kind: pipeline
+name: default
+steps:
+- name: test
+ image: golang:1.10-alpine
+ commands:
+   - "go test"
+- name: build
+ image: golang:1.10-alpine
+ commands:
+   - "go build -o ./myapp"
+- name: publish
+ image: plugins/docker
+ settings:
+   repo: magalixcorp/k8scicd
+   tags: [ "${DRONE_COMMIT_SHA:0:7}","latest" ]
+   username:
+     from_secret: docker_username
+   password:
+     from_secret: docker_password
+- name: deliver
+ image: sinlead/drone-kubectl
+ settings:
+   kubernetes_server:
+     from_secret: k8s_server
+   kubernetes_cert:
+     from_secret: k8s_cert
+   kubernetes_token:
+     from_secret: k8s_token
+ commands:
+   - kubectl apply -f deployment.yml
