@@ -10,22 +10,17 @@ steps:
  commands:
    - "go build -o ./myapp"
 - name: publish
- image: plugins/docker
+ image: plugins/ecr
  settings:
-   repo: magalixcorp/k8scicd
-   tags: [ "${DRONE_COMMIT_SHA:0:7}","latest" ]
-   username:
-     from_secret: docker_username
-   password:
-     from_secret: docker_password
-- name: deliver
- image: sinlead/drone-kubectl
- settings:
-   kubernetes_server:
-     from_secret: k8s_server
-   kubernetes_cert:
-     from_secret: k8s_cert
-   kubernetes_token:
-     from_secret: k8s_token
- commands:
-   - kubectl apply -f deployment.yml
+    access_key:
+      from_secret: ecr_access_key
+    dockerfile: Dockerfile
+    region: ap-southeast-1
+    registry:
+      from_secret: registry_ecr
+    repo:
+      from_secret: repo_ecr
+    secret_key:
+      from_secret: ecr_secret_key
+    tags:
+    - 1.0
