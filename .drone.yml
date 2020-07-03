@@ -5,22 +5,3 @@ steps:
   image: golang:1.10-alpine
   commands:
    - "go test"
-- name: build
-  image: golang:1.10-alpine
-  commands:
-   - "go build -o ./myapp"
-- name: publish
-  image: plugins/ecr
-  settings:
-    access_key:
-      from_secret: ecr_access_key
-    dockerfile: Dockerfile
-    region: ap-southeast-1
-    registry:
-      from_secret: registry_ecr
-    repo:
-      from_secret: repo_ecr
-    secret_key:
-      from_secret: ecr_secret_key
-    tags:
-    - 1.0
